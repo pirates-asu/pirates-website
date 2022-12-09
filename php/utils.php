@@ -1,5 +1,5 @@
 <?php 
-require "connect.php"
+
 function redirect($url) {
     header('Location: '.$url);
     die();
@@ -11,17 +11,12 @@ function isloggedin(){
     }
 }
 
-function isenrolled($uid,$cid){
-    $query="SELECT * form enrollment WHERE uid=".$uid."AND cid=".$cid;
-    $res=mysqli_query($connection,$query);
-    if(mysqli_num_rows($res)){
-        //you can watch videos
+function empty_check($field){
+    if(!empty($field)){
+        return 1;
     }else{
-        //you need to enroll
-
+        return 0;
     }
-    
 }
-
 
 ?>
