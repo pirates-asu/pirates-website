@@ -13,5 +13,6 @@
     isloggedin();
     ?>
     <h1>Hello, <?php echo $_SESSION["username"] ?></h1>
+    
 </body>
 </html>
