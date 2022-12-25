@@ -3,21 +3,6 @@ require("php/sessions.php");
 require("php/database.php");
 
 $db = new DB();
-$pid = $_GET["pid"];
-#$uid = 31;
-
-
-if(isset($_SESSION["username"])){
-  $uname = $_SESSION["username"];
-  $user = mysqli_query($db -> getConnection(), "SELECT uid FROM user WHERE uusername='$uname'");
-  $urow = mysqli_fetch_array($user,MYSQLI_ASSOC);
-  $uid = $urow["uid"];
-
-  $enrolled_course = mysqli_query($db -> getConnection(), "SELECT enrollment.cid FROM course,enrollment,user WHERE user.uid = enrollment.uid and enrollment.cid = course.cid and pid = $pid and user.uusername = '$uname'");
-}
-
-$result = mysqli_query($db -> getConnection(), "SELECT cid,cname,cdescription,clink,imglink FROM course WHERE pid = $pid");
-
 ?>
 <!DOCTYPE html>
 <html style="font-size: 16px;" lang="en"><head>
@@ -47,60 +32,7 @@ $result = mysqli_query($db -> getConnection(), "SELECT cid,cname,cdescription,cl
     <?php include("nav-bar.php");?>
     <section class="u-clearfix u-gradient u-section-1" id="sec-7fc4">
         <?php
-        for($i=0;$i<mysqli_num_rows($result);$i++){
-          $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-          if(isset($_SESSION["username"])){
-            $row1 = mysqli_fetch_array($enrolled_course,MYSQLI_ASSOC);
-          }else{
-            $row1 = NULL;
-          }
-
-          if($i%2 == 0){
-            echo '<div class="box">';
-          }else{
-            echo '<div class="rbox">';
-          }
-          echo "<img src=\"",$row["imglink"],'"';
-          if($i%2 == 0){
-            echo 'style="height:300px;width:470px;margin-left:10em;">';
-          }else{
-            echo 'style="height:300px;width:470px;margin-right:10em;">';
-          }
-          echo '<div class="txtbox">';
-          echo '<div class="desc">';
-          echo ucfirst($row["cname"]);
-          echo '</div>';
-          echo '<div class="desc1">';
-          echo $row["cdescription"];
-          echo '</div>';
-          echo '<div class="butbox">';
-          if(isset($_SESSION["username"])){
-            echo '<a href="CoursesContent.php?pid=',$pid,'&cid=',$row["cid"],'" class="button button1" target="_blank">';
-            if(is_null($row1)){
-              echo 'ENROLL NOW';
-            }else{
-              echo 'LEARN ', strtoupper($row["cname"]);
-            }
-          }else{
-            echo '<a href="login.php" class="button button1">';
-            echo 'ENROLL NOW';
-          }
-
-          echo '</a>';
-          echo '</div>';
-          echo '</div>';
-          echo '</div>';
-          echo '</div>';
-        }
-        mysqli_free_result($result);
-        if(isset($_SESSION["username"])){
-          mysqli_free_result($enrolled_course);
-        }
-
-        #mysqli_close($mysqli);
-        for($i=0;$i<6;$i++){
-          echo '</div>';
-        }
+        $db -> ShowCourses();
         ?>
     </section>
 
