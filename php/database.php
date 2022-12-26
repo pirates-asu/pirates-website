@@ -37,10 +37,10 @@ class DB {
         if(isset($submit) && empty_check($username)&&empty_check($password)==1){
 
             $query="SELECT * FROM user WHERE uusername='".$username."' AND upassword='".md5($password)."'";
-            
-            if(mysqli_num_rows(mysqli_query($this->connection,$query))==1){
+            $res = mysqli_query($this->connection, $query);
+            if(mysqli_num_rows($res)==1){
                 //there exist a user with these credentials
-                return 1;
+                return [1, $res->fetch_assoc()['urole']];
                 
             }else{
                 //there is no user with these credentials
@@ -76,22 +76,99 @@ class DB {
             
         }
     }
-
-
-function EmailAvaiableForRegestiration($email){
-    $query="SELECT * FROM user WHERE uemail='".$email."'";
-    $result  = mysqli_query($this->getConnection(),$query);
-    if(mysqli_num_rows($result)){
-        return 0;
-        
-    }else{
-        return 1;
-        
+    function EmailAvaiableForRegestiration($email){
+        $query="SELECT * FROM user WHERE uemail='".$email."'";
+        $result  = mysqli_query($this->getConnection(),$query);
+        if(mysqli_num_rows($result)){
+            return 0;
+        } else {
+            return 1;
+        }
     }
+
+    function addCourse($c_name, $c_auth, $c_link, $c_studs) {
+        $sql_insert_course =
+        "INSERT INTO `course` (cname, cauthor, clink, cstudentcount)
+        VALUES('$c_name', '$c_auth', '$c_link', $c_studs)";
+        if (mysqli_query($this->getConnection(), $sql_insert_course)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    function addVideo($v_name, $v_link, $c_id) {
+        $sql_insert_vid =
+        "INSERT INTO `video` (vname, vlink, cid)
+        VALUES('$v_name', '$v_link', $c_id)";
+        if (mysqli_query($this->getConnection(), $sql_insert_vid)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function removeCourse($courseID) {
+        $this->removeVideo(NULL, $courseID);
+        if ($courseID) {
+            $sql_remove = "DELETE FROM `course` WHERE `course`.`cid` = $courseID";
+            if (mysqli_query($this->getConnection(), $sql_remove)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    function removeVideo($videoID, $courseID) {
+        if ($videoID) {
+            $sql_remove = "DELETE FROM `video` WHERE `video`.`vid` = $videoID";
+            if (mysqli_query($this->connection, $sql_remove)) return true;
+        } elseif ($courseID) {
+            $sql_remove = "DELETE FROM `video` WHERE `video`.`cid` = $courseID";
+            if (mysqli_query($this->connection, $sql_remove));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function getList($vid1course0) {
+        if ($vid1course0 == 1) {
+            $sql = "SELECT vid, vname FROM video";
+            $col1 = 'vid';
+            $col2 = 'vname';
+        } else {
+            $sql = "SELECT cid, cname FROM course";
+            $col1 = "cid";
+            $col2 = "cname";
+        }
+        $r = mysqli_query(
+            $this->getConnection(),
+            $sql
+        );
+
+        $result_col1 = [];
+        $result_col2 = [];
+        while ($array = mysqli_fetch_array($r)) {
+            $result_col1[] = $array[$col1];
+            $result_col2[] = $array[$col2];
+        }
+        $result = [[]];
+
+        for ($i = 0; $i < count($result_col1); $i++) {
+            array_push($result, 
+            [$result_col1[$i], $result_col2[$i]]);
+        }
+        return array_slice($result, 1);
+    }
+
+    function escapeString($cmd) {
+        return
+            mysqli_real_escape_string($this->getConnection(), $cmd);
+    }
+    
 }
-
-
-
-}
-
 ?>

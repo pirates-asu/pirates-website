@@ -10,9 +10,8 @@
 </head>
 <body>
     <?php
-    isloggedin();
+    isloggedin(1);
     ?>
     <h1>Hello, <?php echo $_SESSION["username"] ?></h1>
-    
 </body>
 </html>
