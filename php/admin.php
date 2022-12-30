@@ -5,10 +5,13 @@ $db = new DB();
 if (isset($_POST['add_course'])) {
 
     $c_name = $db->escapeString($_POST['course_name']);
-    $c_auth = $db->escapeString($_POST['course_author']);
+    //$c_auth = $db->escapeString($_POST['course_author']); // Not currently used
+    $c_desc = $db->escapeString($_POST['course_description']);
     $c_link = $db->escapeString($_POST['course_link']);
+    $c_imag = $db->escapeString($_POST['image_link']);
+    $c_track = $db->escapeString($_POST['course_track']);
 
-    $cadd = $db-> addCourse($c_name, $c_auth, $c_link, 0);
+    $cadd = $db-> addCourse($c_name, $c_desc, $c_link, $c_imag,  0, $c_track);
     if ($cadd)
         ack_added(0);
 }

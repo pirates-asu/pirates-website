@@ -86,10 +86,10 @@ class DB {
         }
     }
 
-    function addCourse($c_name, $c_auth, $c_link, $c_studs) {
+    function addCourse($c_name, $c_desc, $c_link, $c_imag,  $c_studs, $c_track) {
         $sql_insert_course =
-        "INSERT INTO `course` (cname, cauthor, clink, cstudentcount)
-        VALUES('$c_name', '$c_auth', '$c_link', $c_studs)";
+        "INSERT INTO `course` (cname, cdescription, clink, imglink, cstudentcount, pid)
+        VALUES('$c_name', '$c_desc', '$c_link', '$c_imag', '$c_studs', '$c_track')";
         if (mysqli_query($this->getConnection(), $sql_insert_course)) {
             return true;
         } else {
@@ -168,6 +168,16 @@ class DB {
     function escapeString($cmd) {
         return
             mysqli_real_escape_string($this->getConnection(), $cmd);
+    }
+
+    function getTracks() {
+        return 
+        [
+            [1, "Front End"],
+            [2, "Back End"],
+            [3, "Data Science"],
+            [4, "Mobile Developement"]
+        ];
     }
     
 }

@@ -12,12 +12,6 @@
 </header>
 
 <body>
-    <?php
-    $c_addcourse = "active";
-    $c_removecourse = "";
-    $c_addvideo = "";
-    $c_removevideo = "";
-    ?>
     <div class="container">
         <form action="addcourse.php" method="POST">
             <br>
@@ -25,7 +19,23 @@
             <br>
             <label>Course Author</label> <input type="text" name="course_author" placeholder="Course Author"><br>
             <br>
+            <label>Course Description</label> <input type="text" name="course_description" placeholder="Course Description" required><br>
+            <br>
             <label>Course Link</label> <input type="text" name="course_link" placeholder="Course Link" required><br>
+            <br>
+            <label>Image Link</label> <input type="text" name="image_link" placeholder="Image Link" required><br>
+            <br>
+            <label>Course Track</label>
+            <select name="course_track" : class="mainselection">
+                <?php $arr_tracks = $db->getTracks();
+                foreach ($arr_tracks as $atrack): ?>
+
+                <option value="<?php echo $atrack[0]; ?>">
+                    <?php echo $atrack[1]; ?>
+                </option>
+
+                <?php endforeach; ?>
+            </select>
             <br>
             <input class="btn-default" type="submit" value="Add Course" name="add_course">
         </form>

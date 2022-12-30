@@ -12,12 +12,6 @@
 </header>
 
 <body>
-    <?php
-    $c_addcourse = "";
-    $c_removecourse = "";
-    $c_addvideo = "active";
-    $c_removevideo = "";
-    ?>
     <div class="container">
         <br>
         <form action="addvideo.php" method="POST">
