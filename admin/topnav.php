@@ -16,17 +16,11 @@
       header("refresh:0");
    ?>
    <div class="topnav">
-   <?php
-      if ($link == '1') {
-         $_SESSION["username"] = null;
-         redirect("/learntoearn/login.php");
-      }
-      ?>
       <a name="add_course_btn" href="addcourse.php">Add Course </a>
       <a name="remove_course_btn" href="removecourse.php">Remove Course </a>
       <a name="add_video_btn" href="addvideo.php">Add Video </a>
       <a name="remove_video_btn" href="removevideo.php">Remove Video </a>
-      <a name="log_out_btn" href="?p=1">Log Out </a>
+      <a name="log_out_btn" href="logout.php">Log Out </a>
       <img class="topnav" src="<?php echo $path . "/img/pirates-log-admin.php"; ?>"></img>
    </div>
    <br>

@@ -2,5 +2,6 @@
 <?php
 $path = dirname(getcwd(), 1);
 require($path."/php/utils.php");
-logout();
+$_SESSION["username"] = null;
+redirect("/learntoearn/login.php");
 ?>
