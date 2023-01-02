@@ -16,7 +16,7 @@ $db = new DB();
 $signup = $db->signup($_POST["submit"],$username,$password1,$password2,$email,$address,$country,$name);
 
 if ($signup==1){
-    redirect($mainpath."login.php");
+    redirect("/login.php");
 }else{
     echo $signup;
 }

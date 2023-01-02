@@ -3,17 +3,17 @@
 $db = new DB();?>
 <!DOCTYPE html>
 <html style="font-size: 16px;" lang="en"><head>
-    <link rel="stylesheet" href="nav-bar.css" media="screen">
+    <link rel="stylesheet" href="styles/navbar.css" media="screen">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
     <meta name="keywords" content="INNOVATE TO LEAD, ​Select your ​preferred program., INNOVATE TO LEAD, ​Select your ​preferred program.">
     <meta name="description" content="">
-    <title>Landing-page</title>
-    <link rel="stylesheet" href="nicepage.css" media="screen">
-    <link rel="stylesheet" href="Landing-page.css" media="screen">
+    <title>Pirates - Innovate to Lead</title>
+    <link rel="stylesheet" href="styles/nicepage.css" media="screen">
+    <link rel="stylesheet" href="styles/Landing-page.css" media="screen">
 
-    <script class="u-script" type="text/javascript" src="jquery.js" defer=""></script>
-    <script class="u-script" type="text/javascript" src="nicepage.js" defer=""></script>
+    <script class="u-script" type="text/javascript" src="js/jquery.js" defer=""></script>
+    <script class="u-script" type="text/javascript" src="js/nicepage.js" defer=""></script>
     <meta name="generator" content="Nicepage 5.1.5, nicepage.com">
     <link id="u-theme-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i">
     <link id="u-page-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i">
@@ -29,7 +29,7 @@ $db = new DB();?>
     <meta property="og:type" content="website">
   </head>
   <body class="u-body u-xl-mode" data-lang="en">
-  <?php include("nav-bar.php");?>
+  <?php include("navbar.php");?>
   <section class="u-clearfix u-gradient u-section-1" id="sec-91a1">
     <div class="u-clearfix u-sheet u-sheet-1">
       <div class="u-border-5 u-border-palette-1-base u-container-style u-group u-group-1">
@@ -67,7 +67,7 @@ c5.5,0,9.9,4.5,9.9,9.9V73.3z"></path></svg></span>
                   <img class="u-expanded-width u-image u-image-default u-image-2" src="images/frontend.png" alt="" data-image-width="592" data-image-height="461">
                   <h4 class="u-custom-font u-font-roboto-condensed u-hover-feature u-text u-text-custom-color-3 u-text-4">Front End Development</h4>
                   <p class="u-hover-feature u-text u-text-5"> A front-end developer builds the front-end portion of websites and web applications—that is, the part that users actually see and interact with.</p>
-                  <a href="Courses-page.php<?="?pid=1"?>" class="u-btn u-button-style u-hover-feature u-hover-palette-1-dark-1 u-palette-1-base u-text-active-black u-btn-1">APPLY NOW!</a>
+                  <a href="courses.php<?="?pid=1"?>" class="u-btn u-button-style u-hover-feature u-hover-palette-1-dark-1 u-palette-1-base u-text-active-black u-btn-1">APPLY NOW!</a>
                 </div>
               </div>
             </div>
@@ -79,7 +79,7 @@ c5.5,0,9.9,4.5,9.9,9.9V73.3z"></path></svg></span>
                   <img class="u-expanded-width u-image u-image-default u-image-3" src="images/backend.png" alt="" data-image-width="592" data-image-height="461">
                   <h4 class="u-custom-font u-font-roboto-condensed u-hover-feature u-text u-text-custom-color-3 u-text-6">Back End Development</h4>
                   <p class="u-hover-feature u-text u-text-7"> Working on server-side software, which focuses on everything you can't see on a website. Back-end developers ensure the website performs correctly</p>
-                  <a href="Courses-page.php<?="?pid=2"?>" class="u-btn u-button-style u-hover-feature u-hover-palette-1-dark-1 u-palette-1-base u-text-active-black u-btn-2"> APPLY NOW!</a>
+                  <a href="courses.php<?="?pid=2"?>" class="u-btn u-button-style u-hover-feature u-hover-palette-1-dark-1 u-palette-1-base u-text-active-black u-btn-2"> APPLY NOW!</a>
                 </div>
               </div>
             </div>
@@ -92,7 +92,7 @@ c5.5,0,9.9,4.5,9.9,9.9V73.3z"></path></svg></span>
                   <h4 class="u-custom-font u-font-roboto-condensed u-hover-feature u-text u-text-custom-color-3 u-text-8">Data Science</h4>
                   <p class="u-hover-feature u-text u-text-9"> Provides students with the tools to analyze, extract and present data.<br>Gain expertise in machine learning and predictive models.<br>
                   </p>
-                  <a href="Courses-page.php<?="?pid=3"?>" class="u-btn u-button-style u-hover-feature u-hover-palette-1-dark-1 u-palette-1-base u-text-active-black u-btn-3"> APPLY NOW!</a>
+                  <a href="courses.php<?="?pid=3"?>" class="u-btn u-button-style u-hover-feature u-hover-palette-1-dark-1 u-palette-1-base u-text-active-black u-btn-3"> APPLY NOW!</a>
                 </div>
               </div>
             </div>
@@ -104,7 +104,7 @@ c5.5,0,9.9,4.5,9.9,9.9V73.3z"></path></svg></span>
                   <img class="u-expanded-width u-image u-image-default u-image-5" src="images/mobile.png" alt="" data-image-width="592" data-image-height="461">
                   <h4 class="u-custom-font u-font-roboto-condensed u-hover-feature u-text u-text-custom-color-3 u-text-10">Mobile Development</h4>
                   <p class="u-hover-feature u-text u-text-11"> Specialise in mobile technology such as building apps for Google's Android, Apple's iOS and Microsoft's Windows Phone platforms. </p>
-                  <a href="Courses-page.php<?="?pid=4"?>" class="u-btn u-button-style u-hover-feature u-hover-palette-1-dark-1 u-palette-1-base u-text-active-black u-btn-4"> APPLY NOW!</a>
+                  <a href="courses.php<?="?pid=4"?>" class="u-btn u-button-style u-hover-feature u-hover-palette-1-dark-1 u-palette-1-base u-text-active-black u-btn-4"> APPLY NOW!</a>
                 </div>
               </div>
             </div>

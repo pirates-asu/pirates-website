@@ -1,5 +1,6 @@
 <?php
 require "utils.php";
+
 class DB {
     private $host="localhost";
     private $username="root";
@@ -18,7 +19,7 @@ class DB {
 
         if(isset($submit) && empty_check($username)&&empty_check($password1)&&empty_check($email)&&empty_check($address)&&empty_check($country)&&empty_check($name)){
 
-            if($this->PasswordCheckForRegestiration($password1,$password2) == 1 &&$this->EmailAvaiableForRegestiration($email) == 1&& $this->UsernameAvaiableForRegestiration($username) == 1 ){
+            if($this->isPasswordAvailable($password1,$password2) == 1 &&$this->isEmailAvailable($email) == 1&& $this->isUsernameAvailable($username) == 1 ){
                 $query="INSERT INTO user (uusername, upassword, uemail, uname, uaddress, ucountry, urole) VALUES('$username','".md5($password1)."','$email','$name','$address','$country', 1)";
                 $result = mysqli_query($this->getConnection(),$query);
                 return 1;
@@ -34,29 +35,29 @@ class DB {
     }
 
     function login($submit,$username,$password){
-        if(isset($submit) && empty_check($username)&&empty_check($password)==1){
+      if(isset($submit) && empty_check($username)&&empty_check($password)==1){
 
-            $query="SELECT * FROM user WHERE uusername='".$username."' AND upassword='".md5($password)."'";
+          $query="SELECT * FROM user WHERE uusername='".$username."' AND upassword='".md5($password)."'";
+          $res = mysqli_query($this->connection, $query);
+          if(mysqli_num_rows($res)==1){
+              //there exist a user with these credentials
+              return [1, $res->fetch_assoc()['urole']];
 
-            if(mysqli_num_rows(mysqli_query($this->connection,$query))==1){
-                //there exist a user with these credentials
-                return 1;
-
-            }else{
-                //there is no user with these credentials
-                return "please enter valid credentials";
-            }
-        }else{
-                //missing data
-                return "Please enter complete data";
-        }
+          }else{
+              //there is no user with these credentials
+              return "please enter valid credentials";
+          }
+      }else{
+              //missing data
+              return "Please enter complete data";
+      }
     }
 
     function getConnection(){
         return $this->connection;
     }
 
-    function UsernameAvaiableForRegestiration($username){
+    function isUsernameAvailable($username){
         $query="SELECT * FROM user WHERE uusername='".$username."'";
         $result  = mysqli_query($this->getConnection(),$query);
         if(mysqli_num_rows($result)){
@@ -68,7 +69,19 @@ class DB {
         }
     }
 
-    function PasswordCheckForRegestiration($password1,$password2){
+    function getUserCount($cid){
+        $query= "SELECT COUNT(*) FROM enrollment WHERE cid='".$cid."'";
+        $result  = mysqli_query($this->getConnection(),$query);
+        $data = mysqli_fetch_assoc($result);
+        return $data["COUNT(*)"];
+    }
+
+    function setUserCount($cid,$count){
+        $query = "UPDATE course SET cstudentcount='$count' WHERE cid ='$cid'";
+        $result  = mysqli_query($this->getConnection(),$query);
+    }
+
+    function isPasswordAvailable($password1,$password2){
         if($password1===$password2){
             return 1;
         }else{
@@ -77,175 +90,197 @@ class DB {
         }
     }
 
-    function EmailAvaiableForRegestiration($email){
-    $query="SELECT * FROM user WHERE uemail='".$email."'";
-    $result  = mysqli_query($this->getConnection(),$query);
-    if(mysqli_num_rows($result)){
-        return 0;
+    function isEmailAvailable($email){
+      $query="SELECT * FROM user WHERE uemail='".$email."'";
+      $result  = mysqli_query($this->getConnection(),$query);
+        if(mysqli_num_rows($result)){
+            return 0;
 
-    }else{
-        return 1;
-
-    }
-}
-
-    function ShowCourses(){
-    $pid = $_GET["pid"];
-
-    if(isset($_SESSION["username"])){
-      $uname = $_SESSION["username"];
-      $user = mysqli_query($this -> getConnection(), "SELECT uid FROM user WHERE uusername='$uname'");
-      $urow = mysqli_fetch_array($user,MYSQLI_ASSOC);
-      $uid = $urow["uid"];
-
-      $enrolled_course = mysqli_query($this -> getConnection(), "SELECT enrollment.cid FROM course,enrollment,user WHERE user.uid = enrollment.uid and enrollment.cid = course.cid and pid = $pid and user.uusername = '$uname'");
-    }
-
-    $result = mysqli_query($this -> getConnection(), "SELECT cid,cname,cdescription,clink,imglink FROM course WHERE pid = $pid");
-
-    for($i=0;$i<mysqli_num_rows($result);$i++){
-      $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-
-      if(isset($_SESSION["username"])){
-        $row1 = mysqli_fetch_array($enrolled_course,MYSQLI_ASSOC);
-      }else{
-        $row1 = NULL;
-      }
-
-
-      if($i%2 == 0){
-        echo '<div class="box">';
-        echo "<img src=\"",$row["imglink"],'"';
-        echo 'style="height:300px;width:470px;margin-left:10em;">';
-      }else{
-        echo '<div class="rbox">';
-        echo "<img src=\"",$row["imglink"],'"';
-        echo 'style="height:300px;width:470px;margin-right:10em;">';
-      }
-      echo '<div class="txtbox">';
-      echo '<div class="desc">';
-      echo ucfirst($row["cname"]);
-      echo '</div>';
-      echo '<div class="desc1">';
-      echo $row["cdescription"];
-      echo '</div>';
-      echo '<div class="butbox">';
-      if(isset($_SESSION["username"])){
-        echo '<a href="CoursesContent.php?pid=',$pid,'&cid=',$row["cid"],'" class="button button1" target="_blank">';
-        if(is_null($row1)){
-          echo 'ENROLL NOW'; #String Refactoring
         }else{
-          echo 'LEARN ', strtoupper($row["cname"]); #String Refactoring
+            return 1;
+
         }
-      }else{
-        echo '<a href="login.php" class="button button1">';
-        echo 'ENROLL NOW'; #String Refactoring
+    }
+    
+    function addCourse($c_name, $c_desc, $c_link, $c_imag,  $c_studs, $c_track) {
+      $sql_insert_course =
+      "INSERT INTO `course` (cname, cdescription, clink, imglink, cstudentcount, pid)
+      VALUES('$c_name', '$c_desc', '$c_link', '$c_imag', '$c_studs', '$c_track')";
+      if (mysqli_query($this->getConnection(), $sql_insert_course)) {
+          return true;
+      } else {
+          return false;
       }
-      echo '</a>';
-      echo '</div>';
-      echo '</div>';
-      echo '</div>';
-      echo '</div>';
-    }
-    mysqli_free_result($result);
-    if(isset($_SESSION["username"])){
-      mysqli_free_result($enrolled_course);
     }
 
-    for($i=0;$i<6;$i++){
-      echo '</div>';
+    function addVideo($v_name, $v_link, $c_id) {
+      $sql_insert_vid =
+      "INSERT INTO `video` (vname, vlink, cid)
+      VALUES('$v_name', '$v_link', $c_id)";
+      if (mysqli_query($this->getConnection(), $sql_insert_vid)) {
+          return true;
+      } else {
+          return false;
+      }
     }
-  }
 
-  function ShowVidsQuery_CourseName(){
-    $cid = $_GET["cid"];
-    $uname = $_SESSION["username"];
-    $result = mysqli_query($this -> getConnection(), "SELECT cname FROM course WHERE cid = $cid");
-    $user = mysqli_query($this -> getConnection(), "SELECT uid FROM user WHERE uusername='$uname'");
-    $enrolled_course = mysqli_query($this -> getConnection(), "SELECT cid FROM enrollment,user WHERE user.uid = enrollment.uid and cid = $cid and uusername = '$uname'");
-    $videos = mysqli_query($this -> getConnection(), "SELECT vname,vlink FROM video WHERE cid = $cid");
-
-    $row1 = mysqli_fetch_array($enrolled_course,MYSQLI_ASSOC);
-    $cname = mysqli_fetch_array($result,MYSQLI_ASSOC);
-    $urow = mysqli_fetch_array($user,MYSQLI_ASSOC);
-    if(is_null($row1)){
-      $uid = $urow["uid"];
-      $sql = "INSERT INTO enrollment (eid, uid, cid)
-      VALUES (NULL, $uid, $cid)";
-      mysqli_query($this -> getConnection(), $sql);
+    function removeCourse($courseID) {
+      $this->removeVideo(NULL, $courseID);
+      if ($courseID) {
+          $sql_remove = "DELETE FROM `course` WHERE `course`.`cid` = $courseID";
+          if (mysqli_query($this->getConnection(), $sql_remove)) {
+              return true;
+          } else {
+              return false;
+          }
+      } else {
+          return false;
+      }
     }
-    return $cname;
-  }
 
-  function ShowVidsQuery_Video(){
-    $cid = $_GET["cid"];
-    $uname = $_SESSION["username"];
-    $result = mysqli_query($this -> getConnection(), "SELECT cname FROM course WHERE cid = $cid");
-    $user = mysqli_query($this -> getConnection(), "SELECT uid FROM user WHERE uusername='$uname'");
-    $enrolled_course = mysqli_query($this -> getConnection(), "SELECT cid FROM enrollment,user WHERE user.uid = enrollment.uid and cid = $cid and uusername = '$uname'");
-    $videos = mysqli_query($this -> getConnection(), "SELECT vname,vlink FROM video WHERE cid = $cid");
-
-    $row1 = mysqli_fetch_array($enrolled_course,MYSQLI_ASSOC);
-    $cname = mysqli_fetch_array($result,MYSQLI_ASSOC);
-    $urow = mysqli_fetch_array($user,MYSQLI_ASSOC);
-    if(is_null($row1)){
-      $uid = $urow["uid"];
-      $sql = "INSERT INTO enrollment (eid, uid, cid)
-      VALUES (NULL, $uid, $cid)";
-      mysqli_query($this -> getConnection(), $sql);
+    function removeVideo($videoID, $courseID) {
+      if ($videoID) {
+          $sql_remove = "DELETE FROM `video` WHERE `video`.`vid` = $videoID";
+          if (mysqli_query($this->connection, $sql_remove)) return true;
+      } elseif ($courseID) {
+          $sql_remove = "DELETE FROM `video` WHERE `video`.`cid` = $courseID";
+          if (mysqli_query($this->connection, $sql_remove));
+          return true;
+      } else {
+          return false;
+      }
     }
-    return $videos;
-  }
 
-  function ShowCourseName(){
-    $cname= $this -> ShowVidsQuery_CourseName();
-    echo $cname["cname"];
-  }
+    function getList($vid1course0) {
+      if ($vid1course0 == 1) {
+          $sql = "SELECT vid, vname FROM video";
+          $col1 = 'vid';
+          $col2 = 'vname';
+      } else {
+          $sql = "SELECT cid, cname FROM course";
+          $col1 = "cid";
+          $col2 = "cname";
+      }
+      $r = mysqli_query(
+          $this->getConnection(),
+          $sql
+      );
 
-  function ShowFirstVid(){
-    $videos = $this -> ShowVidsQuery_Video();
-    if(is_null($videos)){
+      $result_col1 = [];
+      $result_col2 = [];
+      while ($array = mysqli_fetch_array($r)) {
+          $result_col1[] = $array[$col1];
+          $result_col2[] = $array[$col2];
+      }
+      $result = [[]];
 
-      $first_video["vlink"] = "";
-      $first_video["vname"] = "Course Coming Soon";
-    }else{
-      $first_video = mysqli_fetch_array($videos,MYSQLI_ASSOC);
+      for ($i = 0; $i < count($result_col1); $i++) {
+          array_push($result,
+          [$result_col1[$i], $result_col2[$i]]);
+      }
+      return array_slice($result, 1);
     }
-  }
-  function ShowFirstVid_name(){
-    $videos = $this -> ShowVidsQuery_Video();
-    $first_video = mysqli_fetch_array($videos,MYSQLI_ASSOC);
-    if(is_null($first_video)){
-      $first_video["vlink"] = "";
-      $first_video["vname"] = "Course Coming Soon";
-    }
-    return $first_video["vname"];
-  }
-  function ShowFirstVid_link(){
-    $videos = $this -> ShowVidsQuery_Video();
-    if(is_null($videos)){
 
-      $first_video["vlink"] = "";
-      $first_video["vname"] = "Course Coming Soon";
-    }else{
-      $first_video = mysqli_fetch_array($videos,MYSQLI_ASSOC);
+    function escapeString($cmd) {
+      return
+          mysqli_real_escape_string($this->getConnection(), $cmd);
     }
-    return $first_video["vlink"];
-  }
 
-  function ShowVids(){
-    $videos = $this -> ShowVidsQuery_Video();
-    $video = mysqli_fetch_array($videos,MYSQLI_ASSOC);
-    if(isset($videos)){
-    for($i=0;$i<mysqli_num_rows($videos)-1;$i++){
-      $video = mysqli_fetch_array($videos,MYSQLI_ASSOC);
-      echo '<div class="vid">';
-      echo '<iframe width="200" height="100" src="',$video["vlink"],'"
-      class="list-video"></iframe>';
-      echo '<h3 class="title">',$video["vname"],'</h3>';
-      echo '</div>';
+    function getTracks() {
+      return
+      [
+          [1, "Front End"],
+          [2, "Back End"],
+          [3, "Data Science"],
+          [4, "Mobile Developement"]
+      ];
     }
-  }
-  }
+
+
+    function showCourses(){
+      
+      $pid = $_GET["pid"];
+
+      if(isset($_SESSION["username"])){
+        $uname = $_SESSION["username"];
+        $user = mysqli_query($this -> getConnection(), "SELECT uid FROM user WHERE uusername='$uname'");
+        $urow = mysqli_fetch_array($user,MYSQLI_ASSOC);
+        $uid = $urow["uid"];
+        $enrolled_course = mysqli_query($this -> getConnection(), "SELECT eid,enrollment.cid FROM course,enrollment,user WHERE user.uid = enrollment.uid and enrollment.cid = course.cid and pid = $pid and user.uusername = '$uname'");
+      }
+
+      $result = mysqli_query($this -> getConnection(), "SELECT cid,cname,cdescription,imglink FROM course WHERE pid = $pid");
+      if(isset($_SESSION["username"])){
+        $query = array("result" => $result,
+                    "pid" => $pid,
+                    "uname" => $uname,
+                    "user" => $user,
+                    "urow" => $urow,
+                    "uid" => $uid,
+                    "enrolled_course" => $enrolled_course
+      );
+      }else{
+        $query = array("result" => $result,
+                    "pid" => $pid,
+      );
+      }
+      return $query;
+    }  
+
+    function showCourseName(){
+      $cid = $_GET["cid"];
+      if(isset($_SESSION["username"])==False){
+        header('Location:login.php');
+      }
+      $uname = $_SESSION["username"];
+
+      $result = mysqli_query($this -> getConnection(), "SELECT cname FROM course WHERE cid = $cid");
+      $user = mysqli_query($this -> getConnection(), "SELECT uid,uemail FROM user WHERE uusername='$uname'");
+      $enrolled_course = mysqli_query($this -> getConnection(), "SELECT cid FROM enrollment,user WHERE user.uid = enrollment.uid and cid = $cid and uusername = '$uname'");
+      $videos = mysqli_query($this -> getConnection(), "SELECT vname,vlink FROM video WHERE cid = $cid");
+
+      $row1 = mysqli_fetch_array($enrolled_course,MYSQLI_ASSOC);
+      $cname = mysqli_fetch_array($result,MYSQLI_ASSOC);
+      $urow = mysqli_fetch_array($user,MYSQLI_ASSOC);
+      if(is_null($row1)){
+        $uid = $urow["uid"];
+        $usercount= $this->getUserCount($cid);
+        $this->enrollUser($uid,$cid);
+        $usercount++;
+        $this->setUserCount($cid,$usercount,$urow["uemail"]);
+       
+      }
+      return $cname;
+    }
+
+    function enrollUser($uid,$cid){
+        $sql = "INSERT INTO enrollment (eid, uid, cid)
+        VALUES (NULL, $uid, $cid)";
+        mysqli_query($this -> getConnection(), $sql);
+    }
+
+    function showVideo(){
+      $cid = $_GET["cid"];
+      $uname = $_SESSION["username"];
+      if(isset($_SESSION["username"])==False){
+        header('Location:login.php');
+      }
+      $result = mysqli_query($this -> getConnection(), "SELECT cname FROM course WHERE cid = $cid");
+      $user = mysqli_query($this -> getConnection(), "SELECT uid FROM user WHERE uusername='$uname'");
+
+      $enrolled_course = mysqli_query($this -> getConnection(), "SELECT cid FROM enrollment,user WHERE user.uid = enrollment.uid and cid = $cid and uusername = '$uname'");
+      $videos = mysqli_query($this -> getConnection(), "SELECT vname,vlink FROM video WHERE cid = $cid");
+
+      $row1 = mysqli_fetch_array($enrolled_course,MYSQLI_ASSOC);
+      $cname = mysqli_fetch_array($result,MYSQLI_ASSOC);
+      $urow = mysqli_fetch_array($user,MYSQLI_ASSOC);
+      if(is_null($row1)){
+        $uid = $urow["uid"];
+        $sql = "INSERT INTO enrollment (eid, uid, cid)
+        VALUES (NULL, $uid, $cid)";
+        mysqli_query($this -> getConnection(), $sql);
+      }
+      return $videos;
+    }
 }
 ?>
